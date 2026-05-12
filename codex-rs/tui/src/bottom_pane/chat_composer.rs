@@ -4476,7 +4476,7 @@ impl Renderable for ChatComposer {
         if self.textarea.uses_vim_insert_cursor() {
             crossterm::cursor::SetCursorStyle::SteadyBar
         } else {
-            crossterm::cursor::SetCursorStyle::DefaultUserShape
+            crossterm::cursor::SetCursorStyle::SteadyBar
         }
     }
 
