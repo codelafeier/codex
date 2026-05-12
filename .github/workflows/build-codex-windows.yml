@@ -1,0 +1,39 @@
+name: Build Codex Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - steady-cursor
+    paths:
+      - codex-rs/**
+      - .github/workflows/build-codex-windows.yml
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: codex-rs -> target
+
+      - name: Build Windows binaries
+        run: cargo build --release --manifest-path codex-rs/Cargo.toml --bins
+
+      - name: Upload Windows binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-windows-x64
+          path: codex-rs/target/release/*.exe
