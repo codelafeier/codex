@@ -1,21 +1,19 @@
-name: Build Codex Windows
+name: Build Codex Windows CLI
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-      - steady-cursor
-    paths:
-      - codex-rs/**
-      - .github/workflows/build-codex-windows.yml
 
 permissions:
   contents: read
 
 jobs:
-  build-windows:
+  build-windows-cli:
     runs-on: windows-latest
+    timeout-minutes: 90
+    env:
+      CARGO_TERM_COLOR: always
+      CARGO_PROFILE_RELEASE_LTO: "false"
+      CARGO_PROFILE_RELEASE_CODEGEN_UNITS: "16"
 
     steps:
       - name: Checkout
@@ -29,11 +27,12 @@ jobs:
         with:
           workspaces: codex-rs -> target
 
-      - name: Build Windows binaries
-        run: cargo build --release --manifest-path codex-rs/Cargo.toml --bins
+      - name: Build Codex CLI
+        run: cargo build --release --manifest-path codex-rs/Cargo.toml --bin codex
 
-      - name: Upload Windows binaries
+      - name: Upload codex.exe
         uses: actions/upload-artifact@v4
         with:
-          name: codex-windows-x64
-          path: codex-rs/target/release/*.exe
+          name: codex-windows-x64-cli
+          path: codex-rs/target/release/codex.exe
+          if-no-files-found: error
