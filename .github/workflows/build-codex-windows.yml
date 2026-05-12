@@ -1,10 +1,13 @@
 name: Build Codex Windows CLI
 
+
 on:
   workflow_dispatch:
 
+
 permissions:
   contents: read
+
 
 jobs:
   build-windows-cli:
@@ -14,21 +17,27 @@ jobs:
       CARGO_TERM_COLOR: always
       CARGO_PROFILE_RELEASE_LTO: "false"
       CARGO_PROFILE_RELEASE_CODEGEN_UNITS: "16"
+      RUSTFLAGS: "-C link-arg=/STACK:8388608"
+
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+
 
       - name: Cache Cargo
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: codex-rs -> target
 
+
       - name: Build Codex CLI
         run: cargo build --release --manifest-path codex-rs/Cargo.toml --bin codex
+
 
       - name: Upload codex.exe
         uses: actions/upload-artifact@v4
@@ -36,3 +45,4 @@ jobs:
           name: codex-windows-x64-cli
           path: codex-rs/target/release/codex.exe
           if-no-files-found: error
+
